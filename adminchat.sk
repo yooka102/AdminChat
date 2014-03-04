@@ -1,0 +1,58 @@
+#------------------------------------------------------#
+# Licencja: AdminChat by Yooka                         #
+#------------------------------------------------------#
+#  Nie zezwalam na:                                    #
+#- Zarabianie na skrypcie                              #
+#- Przerabianie/modyfikowanie                          #
+#- Wykorzystywanie kodu skryptu w swoich skryptach     #
+#- Udostepnianiu skryptu innym bez zgody autora        #
+#- Usuwanie tresci zawierajacych iformacje autora      #
+#- Podszywanie sie pod autora                          #
+# Zezwalam na:                                         #
+# - Modyfikowanie wiadomosci skryptu na wlasne         #
+#   potrzeby                                           #
+#------------------------------------------------------#
+# Mylnie odczytana licencja nie zwalnia z              #
+# przestrzegania jej                                   #
+#------------------------------------------------------#
+options:
+	achat.perm: &cNie masz uprawnien
+	achat.join: &2&LDolaczyles do Czatu Administracji
+	achat.leave: &c&LOpusciles Czat Administracji
+
+	achat.tag: &c[&c&LAdminChat&c]
+	achat.name: &6&L%name of player%
+	wersja: 0.1
+
+on join:
+	if player has permission "admin.chat":
+		if {admin.chat.%name of player%} is not set:
+			set {admin.chat.%name of player%} to false
+
+command /achat [<text>]:
+	description: Admin chat
+	trigger:
+		if player doesn't have permission "admin.chat":
+			send "{@achat.perm}"
+			stop
+		if arg is not set:
+			if {admin.chat.%name of player%} is false:
+				set {admin.chat.%name of player%} to true
+				send "{@achat.join}"
+				stop
+			if {admin.chat.%name of player%} is true:
+				set {admin.chat.%name of player%} to false
+				send "{@achat.leave}"
+				stop
+		if arg is set:
+			loop all players:
+				if loop-player has permission "admin.chat":
+					send "{@achat.tag} {@achat.name}&f: &6%arg%" to loop-player
+
+
+on chat:
+	if {admin.chat.%name of player%} is true:
+		cancel event
+		loop all players:
+			if loop-player has permission "admin.chat":
+				send "{@achat.tag} {@achat.name}&f: &6%message%" to loop-player
